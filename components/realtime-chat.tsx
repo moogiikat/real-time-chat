@@ -18,15 +18,12 @@ interface RealtimeChatProps {
   messages?: ChatMessage[]
 }
 
-/**
- * Realtime chat component
- * @param roomName - The name of the room to join. Each room is a unique chat.
- * @param username - The username of the user
- * @param onMessage - The callback function to handle the messages. Useful if you want to store the messages in a database.
- * @param messages - The messages to display in the chat. Useful if you want to display messages from a database.
- * @returns The chat component
- */
-export const RealtimeChat = ({ roomName, username, onMessage, messages: initialMessages = [] }: RealtimeChatProps) => {
+export const RealtimeChat = ({
+  roomName,
+  username,
+  onMessage,
+  messages: initialMessages = [],
+}: RealtimeChatProps) => {
   const { containerRef, scrollToBottom } = useChatScroll()
   const [dbMessages, setDbMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -49,7 +46,9 @@ export const RealtimeChat = ({ roomName, username, onMessage, messages: initialM
       setIsLoading(true)
       setError(null)
       try {
-        const response = await fetch(`/api/messages?roomName=${encodeURIComponent(roomName)}`)
+        const response = await fetch(
+          `/api/messages?roomName=${encodeURIComponent(roomName)}`
+        )
         if (!response.ok) {
           const errorData = await response.json()
           throw new Error(errorData.error || "Failed to fetch messages")
@@ -58,7 +57,9 @@ export const RealtimeChat = ({ roomName, username, onMessage, messages: initialM
         setDbMessages(data.messages || [])
       } catch (error) {
         console.error("Error fetching messages:", error)
-        setError(error instanceof Error ? error.message : "Failed to load messages")
+        setError(
+          error instanceof Error ? error.message : "Failed to load messages"
+        )
       } finally {
         setIsLoading(false)
       }
@@ -69,13 +70,20 @@ export const RealtimeChat = ({ roomName, username, onMessage, messages: initialM
 
   // Merge realtime messages with initial messages and database messages
   const allMessages = useMemo(() => {
-    const mergedMessages = [...initialMessages, ...dbMessages, ...realtimeMessages]
+    const mergedMessages = [
+      ...initialMessages,
+      ...dbMessages,
+      ...realtimeMessages,
+    ]
     // Remove duplicates based on message id
     const uniqueMessages = mergedMessages.filter(
-      (message, index, self) => index === self.findIndex((m) => m.id === message.id),
+      (message, index, self) =>
+        index === self.findIndex((m) => m.id === message.id)
     )
     // Sort by creation date
-    const sortedMessages = uniqueMessages.sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    const sortedMessages = uniqueMessages.sort((a, b) =>
+      a.createdAt.localeCompare(b.createdAt)
+    )
 
     return sortedMessages
   }, [initialMessages, dbMessages, realtimeMessages])
@@ -104,7 +112,7 @@ export const RealtimeChat = ({ roomName, username, onMessage, messages: initialM
         setIsSending(false)
       }
     },
-    [newMessage, isConnected, sendMessage, isSending],
+    [newMessage, isConnected, sendMessage, isSending]
   )
 
   return (
@@ -114,20 +122,30 @@ export const RealtimeChat = ({ roomName, username, onMessage, messages: initialM
         {isLoading ? (
           <div className="flex justify-center items-center h-full">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2 text-sm text-muted-foreground">Loading messages...</span>
+            <span className="ml-2 text-sm text-muted-foreground">
+              Loading messages...
+            </span>
           </div>
         ) : error ? (
-          <div className="text-center text-sm text-red-500 p-4">Error: {error}. Please try refreshing the page.</div>
+          <div className="text-center text-sm text-red-500 p-4">
+            Error: {error}. Please try refreshing the page.
+          </div>
         ) : allMessages.length === 0 ? (
-          <div className="text-center text-sm text-muted-foreground p-4">No messages yet. Start the conversation!</div>
+          <div className="text-center text-sm text-muted-foreground p-4">
+            No messages yet. Start the conversation!
+          </div>
         ) : (
           <div className="space-y-1">
             {allMessages.map((message, index) => {
               const prevMessage = index > 0 ? allMessages[index - 1] : null
-              const showHeader = !prevMessage || prevMessage.user.name !== message.user.name
+              const showHeader =
+                !prevMessage || prevMessage.user.name !== message.user.name
 
               return (
-                <div key={message.id} className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div
+                  key={message.id}
+                  className="animate-in fade-in slide-in-from-bottom-4 duration-300"
+                >
                   <ChatMessageItem
                     message={message}
                     isOwnMessage={message.user.name === username}
@@ -140,11 +158,16 @@ export const RealtimeChat = ({ roomName, username, onMessage, messages: initialM
         )}
       </div>
 
-      <form onSubmit={handleSendMessage} className="flex w-full gap-2 border-t border-border p-4">
+      <form
+        onSubmit={handleSendMessage}
+        className="flex w-full gap-2 border-t border-border p-4"
+      >
         <Input
           className={cn(
             "rounded-full bg-background text-sm transition-all duration-300",
-            isConnected && newMessage.trim() && !isSending ? "w-[calc(100%-36px)]" : "w-full",
+            isConnected && newMessage.trim() && !isSending
+              ? "w-[calc(100%-36px)]"
+              : "w-full"
           )}
           type="text"
           value={newMessage}
@@ -161,7 +184,10 @@ export const RealtimeChat = ({ roomName, username, onMessage, messages: initialM
           </Button>
         )}
         {isSending && (
-          <Button className="aspect-square rounded-full animate-in fade-in slide-in-from-right-4 duration-300" disabled>
+          <Button
+            className="aspect-square rounded-full animate-in fade-in slide-in-from-right-4 duration-300"
+            disabled
+          >
             <Loader2 className="size-4 animate-spin" />
           </Button>
         )}
@@ -169,4 +195,3 @@ export const RealtimeChat = ({ roomName, username, onMessage, messages: initialM
     </div>
   )
 }
-
