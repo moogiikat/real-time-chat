@@ -21,6 +21,7 @@ export default function ChatPage() {
   const [isJoined, setIsJoined] = useState(false);
   const [availableRooms, setAvailableRooms] = useState<string[]>([]);
   const [isLoadingRooms, setIsLoadingRooms] = useState(false);
+  const [availableUsers, setAvailableUsers] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -40,7 +41,22 @@ export default function ChatPage() {
       }
     };
 
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch(`/api/users`);
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableUsers(data.users || []);
+        } else {
+          console.error("Failed to fetch users");
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
     fetchRooms();
+    fetchUsers();
   }, []);
 
   const handleJoin = (e: React.FormEvent) => {
@@ -63,6 +79,11 @@ export default function ChatPage() {
               <MessageSquare className="h-6 w-6 text-primary" />
             </div>
             <CardTitle className="text-2xl">Join Chat</CardTitle>
+            {availableUsers.length > 0 && (
+              <p className="text-sm text-muted-foreground">
+                (Users in system: {availableUsers.length})
+              </p>
+            )}
             <CardDescription>
               You can join an existing room or create your own to enjoy with
               friends. Your username will be your ID, so please be careful.
