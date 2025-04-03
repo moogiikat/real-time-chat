@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RealtimeChat } from "@/components/realtime-chat";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,12 +19,39 @@ export default function ChatPage() {
   const [username, setUsername] = useState("");
   const [roomName, setRoomName] = useState("general");
   const [isJoined, setIsJoined] = useState(false);
+  const [availableRooms, setAvailableRooms] = useState<string[]>([]);
+  const [isLoadingRooms, setIsLoadingRooms] = useState(false);
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      setIsLoadingRooms(true);
+      try {
+        const response = await fetch(`/api/rooms`);
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableRooms(data.rooms || []);
+        } else {
+          console.error("Failed to fetch rooms");
+        }
+      } catch (error) {
+        console.error("Error fetching rooms:", error);
+      } finally {
+        setIsLoadingRooms(false);
+      }
+    };
+
+    fetchRooms();
+  }, []);
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
     if (username.trim() && roomName.trim()) {
       setIsJoined(true);
     }
+  };
+
+  const handleRoomSelect = (room: string) => {
+    setRoomName(room);
   };
 
   return (
@@ -67,6 +94,34 @@ export default function ChatPage() {
                   required
                 />
               </div>
+
+              {isLoadingRooms ? (
+                <p className="text-sm text-center text-muted-foreground">
+                  Loading available rooms...
+                </p>
+              ) : availableRooms.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Available Rooms:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {availableRooms.map((room) => (
+                      <Button
+                        key={room}
+                        type="button"
+                        variant={roomName === room ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handleRoomSelect(room)}
+                      >
+                        {room}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-center text-muted-foreground">
+                  No existing rooms found
+                </p>
+              )}
+
               <Button type="submit" className="w-full">
                 Join Chat
               </Button>
