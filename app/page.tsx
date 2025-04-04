@@ -174,7 +174,7 @@ export default function ChatPage() {
                 </span>
               </h1>
               <p className="text-sm text-muted-foreground">
-                Chatting as
+                Chatting as:
                 <span className="font-medium text-foreground">{username}</span>
               </p>
             </div>
