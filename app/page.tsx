@@ -165,15 +165,23 @@ export default function ChatPage() {
         </div>
       ) : (
         <div className="flex flex-col h-full">
-          <div className="flex justify-between items-center mb-4 p-2 bg-card rounded-lg shadow">
+          <div className="flex justify-between items-center mb-4 p-4 bg-card rounded-lg shadow-md border border-border/40">
             <div>
-              <h1 className="text-xl font-bold">Room: {roomName}</h1>
+              <h1 className="text-xl font-bold flex items-center gap-2">
+                <span>{roomName}</span>
+                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                  Room
+                </span>
+              </h1>
               <p className="text-sm text-muted-foreground">
-                Chatting as: {username}
+                Chatting as
+                <span className="font-medium text-foreground">{username}</span>
               </p>
             </div>
             <Button
               variant="outline"
+              size="sm"
+              className="gap-2 hover:bg-destructive/10 hover:text-destructive transition-colors"
               onClick={() => {
                 setIsJoined(false)
                 // fetch rooms and users again
@@ -181,10 +189,10 @@ export default function ChatPage() {
                 fetchUsers()
               }}
             >
-              Leave Room
+              <span>Leave Room</span>
             </Button>
           </div>
-          <div className="flex-1 border rounded-lg overflow-hidden shadow-lg">
+          <div className="flex-1 border rounded-lg overflow-hidden shadow-lg bg-card/50">
             <RealtimeChat roomName={roomName} username={username} />
           </div>
         </div>
