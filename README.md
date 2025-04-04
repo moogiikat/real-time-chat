@@ -68,3 +68,9 @@ This is a real-time chat application built with Next.js and Supabase. The app al
     ```
 
     Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Preview
+![image](https://github.com/user-attachments/assets/a228f88a-da23-4a2f-bb2e-6b45ab74b486)
+![image](https://github.com/user-attachments/assets/57a843d4-76f2-477f-bb47-3949c685776a)
+
+
