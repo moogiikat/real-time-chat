@@ -24,38 +24,38 @@ export default function ChatPage() {
   const [isLoadingRooms, setIsLoadingRooms] = useState(false)
   const [availableUsers, setAvailableUsers] = useState<string[]>([])
 
+  const fetchRooms = async () => {
+    setIsLoadingRooms(true)
+    try {
+      const response = await fetch(`/api/rooms`)
+      if (response.ok) {
+        const data = await response.json()
+        setAvailableRooms(data.rooms || [])
+      } else {
+        console.error("Failed to fetch rooms")
+      }
+    } catch (error) {
+      console.error("Error fetching rooms:", error)
+    } finally {
+      setIsLoadingRooms(false)
+    }
+  }
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch(`/api/users`)
+      if (response.ok) {
+        const data = await response.json()
+        setAvailableUsers(data.users || [])
+      } else {
+        console.error("Failed to fetch users")
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error)
+    }
+  }
+
   useEffect(() => {
-    const fetchRooms = async () => {
-      setIsLoadingRooms(true)
-      try {
-        const response = await fetch(`/api/rooms`)
-        if (response.ok) {
-          const data = await response.json()
-          setAvailableRooms(data.rooms || [])
-        } else {
-          console.error("Failed to fetch rooms")
-        }
-      } catch (error) {
-        console.error("Error fetching rooms:", error)
-      } finally {
-        setIsLoadingRooms(false)
-      }
-    }
-
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch(`/api/users`)
-        if (response.ok) {
-          const data = await response.json()
-          setAvailableUsers(data.users || [])
-        } else {
-          console.error("Failed to fetch users")
-        }
-      } catch (error) {
-        console.error("Error fetching users:", error)
-      }
-    }
-
     fetchRooms()
     fetchUsers()
   }, [])
@@ -88,7 +88,9 @@ export default function ChatPage() {
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                   <MessageSquare className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle className="text-2xl">Welcome to the Chat Room</CardTitle>
+                <CardTitle className="text-2xl">
+                  Welcome to the Chat Room
+                </CardTitle>
                 {availableUsers.length > 0 && (
                   <p className="text-sm text-muted-foreground">
                     (Users in system: {availableUsers.length})
@@ -170,7 +172,15 @@ export default function ChatPage() {
                 Chatting as: {username}
               </p>
             </div>
-            <Button variant="outline" onClick={() => setIsJoined(false)}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsJoined(false)
+                // fetch rooms and users again
+                fetchRooms()
+                fetchUsers()
+              }}
+            >
               Leave Room
             </Button>
           </div>
