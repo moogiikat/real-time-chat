@@ -40,6 +40,8 @@ This is a real-time chat application built with Next.js and Supabase. The app al
 
     - Create a new project in Supabase.
     - Create a new database in Supabase.
+
+    ```sql
       table name: `chat_messages`
       columns:
       - id: uuid
@@ -47,6 +49,8 @@ This is a real-time chat application built with Next.js and Supabase. The app al
       - user_name: text
       - room_name: text
       - created_at: timestamp
+    ```
+
     - Copy the `supabaseUrl` and `supabaseKey` from your Supabase project settings.
     - Create a `.env.local` file in the root of your project and add the following:
 
